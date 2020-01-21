@@ -9,6 +9,21 @@ const ejs = require('ejs');
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
+app.locals._ = _;
+
+mongoose.connect('mongodb://localhost:27017/cityweather', (err)=>{
+  if(err){
+    console.log(err);
+  }else{
+    console.log('Successfully Connect To DB');
+  }
+});
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
