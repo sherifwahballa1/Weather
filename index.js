@@ -11,6 +11,7 @@ const app = express();
 
 const viewRouter = require('./routers/viewsRouter');
 const userRouter = require('./routers/userRouter');
+const weatherRouter = require('./routers/weatherRouter');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
@@ -37,6 +38,7 @@ app.use(function(req, res, next) {
 
 app.use('/', viewRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/', weatherRouter);
 
 const port = process.env.PORT || 3000;
 
