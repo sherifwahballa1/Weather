@@ -9,6 +9,7 @@ const ejs = require('ejs');
 
 const app = express();
 
+const viewRouter = require('./routers/viewsRouter');
 const userRouter = require('./routers/userRouter');
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -34,6 +35,7 @@ app.use(function(req, res, next) {
 });
 
 
+app.use('/', viewRouter);
 app.use('/api/v1/users', userRouter);
 
 const port = process.env.PORT || 3000;
