@@ -17,7 +17,8 @@ exports.getWeather = catchAsync(async (req, res, next) => {
               n = true;
           }
       });
-      res.render('home', { weather: weatherText, error: null, weatherCityName:req.body.city, weatherCityId: city._id, weatherCityDegree: city.degree, userData: userData.favCities, n: n});
+      const allWeathers = await Weather.find({});
+      res.render('home', { weather: weatherText, error: null, weatherCityName:req.body.city, weatherCityId: city._id, weatherCityDegree: city.degree, userData: userData.favCities, n: n, allWeathers: allWeathers});
 
     }else{
         let cityForm = req.body.city;
@@ -42,8 +43,8 @@ exports.getWeather = catchAsync(async (req, res, next) => {
                     });
 
                     const cityIdD = await Weather.findOne({city: {$eq: req.body.city }});
-
-                    res.render('home', {weather: weatherText, error: null, weatherCityName: req.body.city, weatherCityId: cityIdD._id, weatherCityDegree: cityIdD.degree, userData: userData.favCities, n: false});
+                    const allWeathers = await Weather.find({});
+                    res.render('home', {weather: weatherText, error: null, weatherCityName: req.body.city, weatherCityId: cityIdD._id, weatherCityDegree: cityIdD.degree, userData: userData.favCities, n: false, allWeathers: allWeathers});
                 }
           }
     });
@@ -66,5 +67,46 @@ exports.updateWeather = async(req, res, next) => {
         }
     });
    
-   };
+};
+
+exports.updateDataWeatherEveryday = catchAsync(async(req, res, next) => {
+    const firstData = await Weather.find({}).limit(1);
+    if(firstData.length>0){
+      var d = Date.now()/1000;
+      var date = Date.parse(firstData[0].createdAt)/1000;
+      var subDates = (d-date)/(60 * 24);
+      if(subDates >= 24) {
+        const allData = await Weather.find({});
+        _.forEach(allData, async(val) =>{
+          let apiKey = secret.apiKey;
+          let city = val.city;
+          let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&APPID=${apiKey}`;
+          request(url, async (err, response, body) => {
+            try{
+              let weather = JSON.parse(body);
+              await Weather.updateOne({user: req.user._id, city: {$eq: val.city}},
+                { degree: weather.main.temp, createdAt: Date.now()}, (err, dat)=>{
+                  if(err){
+                    console.log(err);
+                  }else{
+                    console.log(dat);
+                  }
+                });
+            }catch(err){
+              console.log(err);
+            }
+          });
+    
+        });
+      }
+      next();
+    }else{
+     next();
+    }
+    // _.forEach(data, async(val) =>{
+    //   var d = Date.now();
+    //   var date = new Date(val.createdAt);
+    //   console.log();
+    // });
+  });
    

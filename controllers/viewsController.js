@@ -7,11 +7,13 @@ const Weather = require('./../models/cityModel');
 
 
 exports.getOverview = catchAsync(async (req, res) => {
+  const allWeathers = await Weather.find({});
   res.status(200).render('home', {
     title: 'Weather - Home',
     weather: null,
     error: null,
-    userData: req.user.favCities
+    userData: req.user.favCities,
+    allWeathers: allWeathers
   });
 });
 

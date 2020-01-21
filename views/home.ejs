@@ -50,9 +50,13 @@
         <% if(userData){%>
           <% _.forEach(userData, function(val, i){ %>
           <tr>
-            <th scope="row"><%= i %></th>
-            <td><%=val.cityName%></td>
-            <td><%=val.degree%></td>
+            <th scope="row"><%= i+1 %></th>
+            <td><%=val.cityName %></td>
+            <% for(var j=0; j< allWeathers.length; j++){%>
+              <% if(val.cityName === allWeathers[j].city ){%>
+                <td><%= allWeathers[j].degree %></td>
+              <%}%>
+            <%}%>
           </tr>
          <% }) %>
         <%} else{%>
