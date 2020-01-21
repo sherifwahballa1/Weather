@@ -25,33 +25,35 @@ exports.getWeather = catchAsync(async (req, res, next) => {
         let url = `http://api.openweathermap.org/data/2.5/weather?q=${cityForm}&units=metric&APPID=${secret.apiKey}`;
         request(url, async (err, response, body) => {
           if(err){
-            res.render('home', {weather: null, error: 'Error, please try again'});
+            const allWeathers = await Weather.find({});
+            res.render('home', {weather: null, error: 'Error, please try again', userData: userData.favCities, n: n, allWeathers: allWeathers});
           } else {
                 let weather = JSON.parse(body);
                 if(weather.main == undefined){
-                res.render('home', {weather: null, error: 'Error, please try again'});
+                    const allWeathers = await Weather.find({});
+                    res.render('home', {weather: null, error: 'Error, please try again', userData: userData.favCities, n: n, allWeathers: allWeathers});
                 } else {
+                    var lid= '0';
                     let weatherText = `It's ${weather.main.temp} °C degrees in ${weather.name}!`;
                     const newWeather = new Weather();
                     newWeather.user = req.user._id;
                     newWeather.city = req.body.city;
                     newWeather.degree = weather.main.temp;
-                    await newWeather.save((err, result)=>{
+                    await newWeather.save(async(err, result)=>{
                         if(err){
                             return next(err);
+                        }else{
+                            const allWeathers = await Weather.find({});
+                             res.render('home', {weather: weatherText, error: null, weatherCityName: req.body.city, weatherCityId: result._id, weatherCityDegree: result.degree, userData: userData.favCities, n: false, allWeathers: allWeathers});
                         }
                     });
-
-                    const cityIdD = await Weather.findOne({city: {$eq: req.body.city }});
-                    const allWeathers = await Weather.find({});
-                    res.render('home', {weather: weatherText, error: null, weatherCityName: req.body.city, weatherCityId: cityIdD._id, weatherCityDegree: cityIdD.degree, userData: userData.favCities, n: false, allWeathers: allWeathers});
                 }
           }
     });
   }
 });
 
-exports.updateWeather = async(req, res, next) => {
+exports.updateWeather = catchAsync(async(req, res, next) => {
     await User.updateOne({
         '_id': {$eq: req.user._id},
         'favCities.cityId': {$ne: req.body.cityId}
@@ -61,13 +63,22 @@ exports.updateWeather = async(req, res, next) => {
             'cityName': req.body.cityName,
             'degree': req.body.cityDegree
         }}
-    }, (err) => {
+    },(err, result) => {
         if(err){ 
             console.log(err);
+        }else{
+          res.status(200).json({
+            status: 'success',
+            message: 'city Updated',
+            date: {
+              data: result
+            }
+          });
         }
     });
+
    
-};
+});
 
 exports.updateDataWeatherEveryday = catchAsync(async(req, res, next) => {
     const firstData = await Weather.find({}).limit(1);
