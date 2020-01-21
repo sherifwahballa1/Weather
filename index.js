@@ -9,6 +9,8 @@ const ejs = require('ejs');
 
 const app = express();
 
+const userRouter = require('./routers/userRouter');
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -30,6 +32,9 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "*");
   next();
 });
+
+
+app.use('/api/v1/users', userRouter);
 
 const port = process.env.PORT || 3000;
 
