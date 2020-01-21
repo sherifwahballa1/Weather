@@ -20,7 +20,15 @@
 
         <% if(weather !== null){ %>
             <p><%= weather %></p>
-        <% } %> 
+           <% if(n === false ) {%>
+              <form id="form-fav">
+                  <input type="hidden" id="weatherCityName" value="<%= weatherCityName %>">
+                  <input type="hidden" id="weatherCityId" value="<%= weatherCityId %>">
+                  <input type="hidden" id="cityDegree" value="<%= weatherCityDegree %>">
+                  <button class="btn btn-lg btn-danger" style="position: relative;top: -55px;left: 338px;">Favourite</button>
+              </form>
+            <% } %>
+          <% } %>
         
           
           <% if(error !== null){ %>
@@ -29,7 +37,30 @@
 
     </fieldset>
 <h1>Favourite Cities</h1>
-</div>
+<div>
+    <table class="table table-striped table-dark">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">City</th>
+          <th scope="col">Degree</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if(userData){%>
+          <% _.forEach(userData, function(val, i){ %>
+          <tr>
+            <th scope="row"><%= i %></th>
+            <td><%=val.cityName%></td>
+            <td><%=val.degree%></td>
+          </tr>
+         <% }) %>
+        <%} else{%>
+        <%}%>
+      </tbody>
+    </table>
+
+  </div>
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -38,7 +69,7 @@
   integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
   crossorigin="anonymous">
 </script>
-<script src="/js/fetchWeather.js"></script>
+<script src="/js/favCity.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
 </script>
 </body>

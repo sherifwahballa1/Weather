@@ -39,7 +39,8 @@ const userSchema = new mongoose.Schema({
     },
     favCities: [{
          cityName: { type: String, default: ''},
-         cityId: { type: mongoose.Schema.Types.ObjectId, ref: 'City' }
+         cityId: { type: mongoose.Schema.Types.ObjectId, ref: 'City' },
+         degree: { type: String, default: ''}
         }]
   },
   {

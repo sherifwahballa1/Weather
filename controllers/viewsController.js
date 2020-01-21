@@ -10,7 +10,8 @@ exports.getOverview = catchAsync(async (req, res) => {
   res.status(200).render('home', {
     title: 'Weather - Home',
     weather: null,
-    error: null
+    error: null,
+    userData: req.user.favCities
   });
 });
 
