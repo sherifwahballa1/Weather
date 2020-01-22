@@ -2,13 +2,21 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize'); //for nosql injection
+const xxs = require('xss-clean'); //for injection
 const _ = require('lodash');
 let request = require('request');
 const path = require('path');
 const ejs = require('ejs');
 const cron = require('node-cron');
 const cors = require('cors');
+
 const app = express();
+app.enable('trust proxy');
+
+//set Security HTTP headers
+app.use(helmet());
 
 const viewRouter = require('./routers/viewsRouter');
 const userRouter = require('./routers/userRouter');
@@ -24,6 +32,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 app.locals._ = _;
+
+//Data sanitization against NoSQL Query injection
+app.use(mongoSanitize()); // prevent from NoSQL injection like (email:{"$gt":""}) in body
+
+// Data sanitization aganist cross-site scripting (XSS)
+app.use(xxs()); //prevent if code contain html code or js code in body and convert it to symboles known
+
 
 // mongoose.connect('mongodb://localhost:27017/cityweather', (err)=>{
 //   if(err){
