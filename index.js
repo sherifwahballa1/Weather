@@ -7,6 +7,7 @@ let request = require('request');
 const path = require('path');
 const ejs = require('ejs');
 const cron = require('node-cron');
+const cors = require('cors');
 const app = express();
 
 const viewRouter = require('./routers/viewsRouter');
@@ -46,6 +47,7 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.use(cors()); // receive any error from front end
 
 cron.schedule('* */24 * * *', async() => {
     const firstData = await Weather.find({}).limit(1);
